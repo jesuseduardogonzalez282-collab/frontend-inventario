@@ -19,6 +19,16 @@ def get_device(id):
             return jsonify(device)
     return jsonify({"error": "Dispositivo no encontrado"}), 404
 
+@app.route('/')
+def home():
+    return jsonify({
+        "mensaje": "API de inventario funcionando",
+        "endpoints": [
+            "/devices",
+            "/devices/<id>"
+        ]
+    })
+
 # POST crear
 @app.route('/devices', methods=['POST'])
 def create_device():
