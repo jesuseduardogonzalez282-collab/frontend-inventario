@@ -3,6 +3,55 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+# Página principal (HTML bonito)
+@app.route('/')
+def home():
+    return """
+    <html>
+    <head>
+        <title>API Inventario</title>
+        <style>
+            body {
+                font-family: Arial;
+                background: #0f172a;
+                color: white;
+                text-align: center;
+                padding: 50px;
+            }
+            h1 {
+                color: #38bdf8;
+            }
+            .box {
+                background: #1e293b;
+                padding: 20px;
+                border-radius: 10px;
+                display: inline-block;
+            }
+            a {
+                color: #22c55e;
+                text-decoration: none;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🚀 API de Inventario de TI</h1>
+        <div class="box">
+            <p>Bienvenido a mi API</p>
+            <p>Endpoints disponibles:</p>
+            <ul style="list-style: none;">
+                <li><a href="/devices">GET /devices</a></li>
+                <li>GET /devices/{id}</li>
+                <li>POST /devices</li>
+                <li>PUT /devices/{id}</li>
+                <li>DELETE /devices/{id}</li>
+            </ul>
+        </div>
+    </body>
+    </html>
+    """
+
+# Base de datos en memoria
 devices = []
 current_id = 1
 
@@ -19,21 +68,14 @@ def get_device(id):
             return jsonify(device)
     return jsonify({"error": "Dispositivo no encontrado"}), 404
 
-@app.route('/')
-def home():
-    return jsonify({
-        "mensaje": "API de inventario funcionando",
-        "endpoints": [
-            "/devices",
-            "/devices/<id>"
-        ]
-    })
-
 # POST crear
 @app.route('/devices', methods=['POST'])
 def create_device():
     global current_id
     data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "JSON inválido"}), 400
 
     # Validación
     required_fields = ['nombre', 'tipo', 'estado', 'area']
