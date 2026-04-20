@@ -6,91 +6,34 @@
 
 <style>
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: Arial;
     background: #0f172a;
     color: white;
     text-align: center;
 }
 
 h1 {
-    margin-top: 20px;
     color: #38bdf8;
-}
-
-.container {
-    width: 90%;
-    margin: auto;
     margin-top: 20px;
 }
 
-.card {
-    background: #1e293b;
-    padding: 15px;
+iframe {
+    width: 90%;
+    height: 500px;
+    border: none;
+    margin-top: 20px;
     border-radius: 10px;
-    margin: 10px;
-    display: inline-block;
-    width: 250px;
-    text-align: left;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
-}
-
-.card h3 {
-    margin: 0;
-    color: #22c55e;
-}
-
-.card p {
-    margin: 5px 0;
 }
 </style>
-
 </head>
 
 <body>
 
 <h1>📦 Inventario de Dispositivos</h1>
 
-<div class="container" id="contenedor">
-    Cargando datos...
-</div>
+<p>Datos obtenidos desde la API:</p>
 
-<script>
-const API = "https://api-inventario-1-71ck.onrender.com/devices";
-
-function cargar() {
-    fetch(API)
-    .then(res => res.json())
-    .then(data => {
-        let contenedor = document.getElementById("contenedor");
-
-        if (data.length === 0) {
-            contenedor.innerHTML = "<p>No hay dispositivos registrados</p>";
-            return;
-        }
-
-        contenedor.innerHTML = "";
-
-        data.forEach(d => {
-            contenedor.innerHTML += `
-            <div class="card">
-                <h3>${d.nombre}</h3>
-                <p><b>Tipo:</b> ${d.tipo}</p>
-                <p><b>Estado:</b> ${d.estado}</p>
-                <p><b>Área:</b> ${d.area}</p>
-                <p><b>ID:</b> ${d.id}</p>
-            </div>
-            `;
-        });
-    })
-    .catch(error => {
-        document.getElementById("contenedor").innerHTML =
-            "<p>Error al conectar con la API</p>";
-        console.error(error);
-    });
-}
-
-cargar();
-</script>
+<iframe src="https://api-inventario-2.onrender.com/devices"></iframe>
 
 </body>
 </html>
