@@ -6,23 +6,52 @@
 
 <style>
 body {
-    font-family: Arial;
-    background: #0f172a;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
     color: white;
     text-align: center;
 }
 
 h1 {
-    color: #38bdf8;
     margin-top: 20px;
+    color: #38bdf8;
 }
 
-iframe {
-    width: 90%;
-    height: 500px;
-    border: none;
+#status {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #facc15;
+}
+
+.container {
     margin-top: 20px;
-    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    background: #1e293b;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 12px;
+    width: 250px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.4);
+    text-align: left;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card h3 {
+    margin: 0;
+    color: #22c55e;
+}
+
+.card p {
+    margin: 5px 0;
 }
 </style>
 </head>
@@ -30,10 +59,57 @@ iframe {
 <body>
 
 <h1>📦 Inventario de Dispositivos</h1>
+<div id="status">🔄 Conectando con la API...</div>
 
-<p>Datos obtenidos desde la API:</p>
+<div class="container" id="contenedor"></div>
 
-<iframe src="https://api-inventario-2.onrender.com/devices"></iframe>
+<script>
+const API = "https://api-inventario-2.onrender.com/devices";
+
+function cargar() {
+    fetch(API)
+    .then(res => res.json())
+    .then(data => {
+        const contenedor = document.getElementById("contenedor");
+        const status = document.getElementById("status");
+
+        if (!data || data.length === 0) {
+            status.innerHTML = "⚠️ No hay dispositivos registrados";
+            contenedor.innerHTML = "";
+            return;
+        }
+
+        status.innerHTML = "✅ Conectado correctamente";
+
+        contenedor.innerHTML = "";
+
+        data.forEach(d => {
+            contenedor.innerHTML += `
+            <div class="card">
+                <h3>${d.nombre}</h3>
+                <p><b>Tipo:</b> ${d.tipo}</p>
+                <p><b>Estado:</b> ${d.estado}</p>
+                <p><b>Área:</b> ${d.area}</p>
+                <p><b>ID:</b> ${d.id}</p>
+            </div>
+            `;
+        });
+    })
+    .catch(error => {
+        document.getElementById("status").innerHTML =
+            "⏳ La API está iniciando... espera unos segundos";
+
+        document.getElementById("contenedor").innerHTML = "";
+
+        console.error(error);
+    });
+}
+
+// 🔄 Auto refresco cada 5 segundos
+setInterval(cargar, 5000);
+
+cargar();
+</script>
 
 </body>
 </html>
