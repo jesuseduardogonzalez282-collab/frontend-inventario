@@ -6,54 +6,73 @@
 
 <style>
 body {
-    font-family: Arial;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
     text-align: center;
 }
 
+h1 {
+    color: #2563eb;
+}
+
 .container {
-    background: #1e293b;
+    background: white;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
     width: 400px;
     margin: auto;
     margin-top: 30px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
 }
 
 input {
     width: 90%;
     padding: 10px;
-    margin: 5px;
-    border-radius: 5px;
-    border: none;
+    margin: 6px;
+    border-radius: 6px;
+    border: 1px solid #cbd5f5;
 }
 
 button {
     padding: 10px;
     margin: 5px;
+    border-radius: 6px;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
 }
 
-.btn-guardar { background: #22c55e; color: white; }
-.btn-eliminar { background: #ef4444; color: white; }
+.btn-guardar {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-eliminar {
+    background: #dc2626;
+    color: white;
+}
 
 table {
     margin: auto;
     margin-top: 20px;
     border-collapse: collapse;
     width: 90%;
+    background: white;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
 }
 
 td, th {
-    border: 1px solid #334155;
+    border-bottom: 1px solid #e2e8f0;
     padding: 10px;
 }
 
+th {
+    background: #2563eb;
+    color: white;
+}
+
 tr:hover {
-    background: #334155;
+    background: #f1f5f9;
 }
 </style>
 
@@ -61,10 +80,10 @@ tr:hover {
 
 <body>
 
-<h1>🚀 Inventario de Dispositivos</h1>
+<h1>📊 Sistema de Inventario</h1>
 
 <div class="container">
-    <input id="nombre" placeholder="Nombre">
+    <input id="nombre" placeholder="Nombre del dispositivo">
     <input id="tipo" placeholder="Tipo">
     <input id="estado" placeholder="Estado">
     <input id="area" placeholder="Área">
@@ -73,7 +92,7 @@ tr:hover {
     <button class="btn-guardar" onclick="crear()">Guardar</button>
 </div>
 
-<h2>📋 Lista de dispositivos</h2>
+<h2>📋 Dispositivos registrados</h2>
 
 <table id="tabla">
 <tr>
