@@ -12,9 +12,7 @@ body {
     text-align: center;
 }
 
-h1 {
-    color: #2563eb;
-}
+h1 { color: #2563eb; }
 
 .container {
     background: white;
@@ -42,15 +40,9 @@ button {
     cursor: pointer;
 }
 
-.btn-guardar {
-    background: #2563eb;
-    color: white;
-}
-
-.btn-eliminar {
-    background: #dc2626;
-    color: white;
-}
+.btn-guardar { background: #2563eb; color: white; }
+.btn-editar { background: #f59e0b; color: white; }
+.btn-eliminar { background: #dc2626; color: white; }
 
 table {
     margin: auto;
@@ -89,79 +81,104 @@ tr:hover {
     <input id="area" placeholder="Área">
 
     <br>
-    <button class="btn-guardar" onclick="crear()">Guardar</button>
+    <button class="btn-guardar" onclick="guardar()">Guardar / Actualizar</button>
 </div>
+
+<input id="buscar" placeholder="🔍 Buscar..." onkeyup="filtrar()">
 
 <h2>📋 Dispositivos registrados</h2>
 
-<table id="tabla">
-<tr>
-<th>ID</th>
-<th>Nombre</th>
-<th>Tipo</th>
-<th>Estado</th>
-<th>Área</th>
-<th>Acción</th>
-</tr>
-</table>
+<table id="tabla"></table>
 
 <script>
 const API = "https://api-inventario-iaww.onrender.com/devices";
+
+let editandoId = null;
+let datos = [];
 
 function cargar() {
     fetch(API)
     .then(res => res.json())
     .then(data => {
-        let tabla = document.getElementById("tabla");
-
-        tabla.innerHTML = `
-        <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Tipo</th>
-        <th>Estado</th>
-        <th>Área</th>
-        <th>Acción</th>
-        </tr>`;
-
-        data.forEach(d => {
-            tabla.innerHTML += `
-            <tr>
-                <td>${d.id}</td>
-                <td>${d.nombre}</td>
-                <td>${d.tipo}</td>
-                <td>${d.estado}</td>
-                <td>${d.area}</td>
-                <td>
-                    <button class="btn-eliminar" onclick="eliminar(${d.id})">Eliminar</button>
-                </td>
-            </tr>`;
-        });
+        datos = data;
+        render(data);
     });
 }
 
-function crear() {
-    fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            nombre: document.getElementById("nombre").value,
-            tipo: document.getElementById("tipo").value,
-            estado: document.getElementById("estado").value,
-            area: document.getElementById("area").value
-        })
-    })
-    .then(() => {
-        limpiar();
-        cargar();
+function render(lista) {
+    let tabla = document.getElementById("tabla");
+
+    tabla.innerHTML = `
+    <tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Tipo</th>
+    <th>Estado</th>
+    <th>Área</th>
+    <th>Acción</th>
+    </tr>`;
+
+    lista.forEach(d => {
+        tabla.innerHTML += `
+        <tr>
+            <td>${d.id}</td>
+            <td>${d.nombre}</td>
+            <td>${d.tipo}</td>
+            <td>${d.estado}</td>
+            <td>${d.area}</td>
+            <td>
+                <button class="btn-editar" onclick="editar(${d.id})">Editar</button>
+                <button class="btn-eliminar" onclick="eliminar(${d.id})">Eliminar</button>
+            </td>
+        </tr>`;
     });
+}
+
+function guardar() {
+    const data = {
+        nombre: document.getElementById("nombre").value,
+        tipo: document.getElementById("tipo").value,
+        estado: document.getElementById("estado").value,
+        area: document.getElementById("area").value
+    };
+
+    if (editandoId) {
+        fetch(API + "/" + editandoId, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(() => {
+            editandoId = null;
+            limpiar();
+            cargar();
+        });
+    } else {
+        fetch(API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(() => {
+            limpiar();
+            cargar();
+        });
+    }
+}
+
+function editar(id) {
+    let d = datos.find(x => x.id === id);
+
+    document.getElementById("nombre").value = d.nombre;
+    document.getElementById("tipo").value = d.tipo;
+    document.getElementById("estado").value = d.estado;
+    document.getElementById("area").value = d.area;
+
+    editandoId = id;
 }
 
 function eliminar(id) {
     fetch(API + "/" + id, {
         method: "DELETE"
-    })
-    .then(() => cargar());
+    }).then(() => cargar());
 }
 
 function limpiar() {
@@ -169,6 +186,12 @@ function limpiar() {
     document.getElementById("tipo").value = "";
     document.getElementById("estado").value = "";
     document.getElementById("area").value = "";
+}
+
+function filtrar() {
+    let texto = document.getElementById("buscar").value.toLowerCase();
+    let filtrados = datos.filter(d => d.nombre.toLowerCase().includes(texto));
+    render(filtrados);
 }
 
 cargar();
