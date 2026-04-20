@@ -7,64 +7,40 @@
 <style>
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: #f1f5f9;
-    color: #1e293b;
+    background: #0f172a;
+    color: white;
     text-align: center;
 }
 
-h1 { color: #2563eb; }
+h1 {
+    margin-top: 20px;
+    color: #38bdf8;
+}
 
 .container {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    width: 400px;
-    margin: auto;
-    margin-top: 30px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-}
-
-input {
     width: 90%;
-    padding: 10px;
-    margin: 6px;
-    border-radius: 6px;
-    border: 1px solid #cbd5f5;
-}
-
-button {
-    padding: 10px;
-    margin: 5px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-}
-
-.btn-guardar { background: #2563eb; color: white; }
-.btn-editar { background: #f59e0b; color: white; }
-.btn-eliminar { background: #dc2626; color: white; }
-
-table {
     margin: auto;
     margin-top: 20px;
-    border-collapse: collapse;
-    width: 90%;
-    background: white;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
 }
 
-td, th {
-    border-bottom: 1px solid #e2e8f0;
-    padding: 10px;
+.card {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px;
+    display: inline-block;
+    width: 250px;
+    text-align: left;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
 }
 
-th {
-    background: #2563eb;
-    color: white;
+.card h3 {
+    margin: 0;
+    color: #22c55e;
 }
 
-tr:hover {
-    background: #f1f5f9;
+.card p {
+    margin: 5px 0;
 }
 </style>
 
@@ -72,126 +48,45 @@ tr:hover {
 
 <body>
 
-<h1>📊 Sistema de Inventario</h1>
+<h1>📦 Inventario de Dispositivos</h1>
 
-<div class="container">
-    <input id="nombre" placeholder="Nombre del dispositivo">
-    <input id="tipo" placeholder="Tipo">
-    <input id="estado" placeholder="Estado">
-    <input id="area" placeholder="Área">
-
-    <br>
-    <button class="btn-guardar" onclick="guardar()">Guardar / Actualizar</button>
+<div class="container" id="contenedor">
+    Cargando datos...
 </div>
-
-<input id="buscar" placeholder="🔍 Buscar..." onkeyup="filtrar()">
-
-<h2>📋 Dispositivos registrados</h2>
-
-<table id="tabla"></table>
 
 <script>
 const API = "https://api-inventario-1-71ck.onrender.com/devices";
-
-let editandoId = null;
-let datos = [];
 
 function cargar() {
     fetch(API)
     .then(res => res.json())
     .then(data => {
-        datos = data;
-        render(data);
-    });
-}
+        let contenedor = document.getElementById("contenedor");
 
-function render(lista) {
-    let tabla = document.getElementById("tabla");
+        if (data.length === 0) {
+            contenedor.innerHTML = "<p>No hay dispositivos registrados</p>";
+            return;
+        }
 
-    tabla.innerHTML = `
-    <tr>
-    <th>ID</th>
-    <th>Nombre</th>
-    <th>Tipo</th>
-    <th>Estado</th>
-    <th>Área</th>
-    <th>Acción</th>
-    </tr>`;
+        contenedor.innerHTML = "";
 
-    lista.forEach(d => {
-        tabla.innerHTML += `
-        <tr>
-            <td>${d.id}</td>
-            <td>${d.nombre}</td>
-            <td>${d.tipo}</td>
-            <td>${d.estado}</td>
-            <td>${d.area}</td>
-            <td>
-                <button class="btn-editar" onclick="editar(${d.id})">Editar</button>
-                <button class="btn-eliminar" onclick="eliminar(${d.id})">Eliminar</button>
-            </td>
-        </tr>`;
-    });
-}
-
-function guardar() {
-    const data = {
-        nombre: document.getElementById("nombre").value,
-        tipo: document.getElementById("tipo").value,
-        estado: document.getElementById("estado").value,
-        area: document.getElementById("area").value
-    };
-
-    if (editandoId) {
-        fetch(API + "/" + editandoId, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        }).then(() => {
-            editandoId = null;
-            limpiar();
-            cargar();
+        data.forEach(d => {
+            contenedor.innerHTML += `
+            <div class="card">
+                <h3>${d.nombre}</h3>
+                <p><b>Tipo:</b> ${d.tipo}</p>
+                <p><b>Estado:</b> ${d.estado}</p>
+                <p><b>Área:</b> ${d.area}</p>
+                <p><b>ID:</b> ${d.id}</p>
+            </div>
+            `;
         });
-    } else {
-        fetch(API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        }).then(() => {
-            limpiar();
-            cargar();
-        });
-    }
-}
-
-function editar(id) {
-    let d = datos.find(x => x.id === id);
-
-    document.getElementById("nombre").value = d.nombre;
-    document.getElementById("tipo").value = d.tipo;
-    document.getElementById("estado").value = d.estado;
-    document.getElementById("area").value = d.area;
-
-    editandoId = id;
-}
-
-function eliminar(id) {
-    fetch(API + "/" + id, {
-        method: "DELETE"
-    }).then(() => cargar());
-}
-
-function limpiar() {
-    document.getElementById("nombre").value = "";
-    document.getElementById("tipo").value = "";
-    document.getElementById("estado").value = "";
-    document.getElementById("area").value = "";
-}
-
-function filtrar() {
-    let texto = document.getElementById("buscar").value.toLowerCase();
-    let filtrados = datos.filter(d => d.nombre.toLowerCase().includes(texto));
-    render(filtrados);
+    })
+    .catch(error => {
+        document.getElementById("contenedor").innerHTML =
+            "<p>Error al conectar con la API</p>";
+        console.error(error);
+    });
 }
 
 cargar();
