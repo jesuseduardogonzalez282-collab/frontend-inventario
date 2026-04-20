@@ -1,9 +1,16 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)  # 🔥 IMPORTANTE: permite conexión con tu frontend
+
+# 🔥 CORS MANUAL (esto sí o sí funciona)
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    return response
+
 
 # Página principal
 @app.route('/')
@@ -51,14 +58,17 @@ def home():
     </html>
     """
 
+
 # Base de datos en memoria
 devices = []
 current_id = 1
+
 
 # GET todos
 @app.route('/devices', methods=['GET'])
 def get_devices():
     return jsonify(devices)
+
 
 # GET uno
 @app.route('/devices/<int:id>', methods=['GET'])
@@ -67,6 +77,7 @@ def get_device(id):
         if device['id'] == id:
             return jsonify(device)
     return jsonify({"error": "Dispositivo no encontrado"}), 404
+
 
 # POST crear
 @app.route('/devices', methods=['POST'])
@@ -96,6 +107,7 @@ def create_device():
 
     return jsonify(new_device), 201
 
+
 # PUT actualizar
 @app.route('/devices/<int:id>', methods=['PUT'])
 def update_device(id):
@@ -110,6 +122,7 @@ def update_device(id):
             return jsonify(device)
 
     return jsonify({"error": "Dispositivo no encontrado"}), 404
+
 
 # DELETE eliminar
 @app.route('/devices/<int:id>', methods=['DELETE'])
