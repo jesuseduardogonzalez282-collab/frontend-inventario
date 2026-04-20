@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
+CORS(app)  # 🔥 IMPORTANTE: permite conexión con tu frontend
 
-# Página principal (HTML bonito)
+# Página principal
 @app.route('/')
 def home():
     return """
@@ -18,9 +20,7 @@ def home():
                 text-align: center;
                 padding: 50px;
             }
-            h1 {
-                color: #38bdf8;
-            }
+            h1 { color: #38bdf8; }
             .box {
                 background: #1e293b;
                 padding: 20px;
@@ -77,7 +77,6 @@ def create_device():
     if not data:
         return jsonify({"error": "JSON inválido"}), 400
 
-    # Validación
     required_fields = ['nombre', 'tipo', 'estado', 'area']
     for field in required_fields:
         if field not in data or not data[field]:
